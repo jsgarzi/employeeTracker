@@ -41,10 +41,10 @@ function run() {
             var arr = answer.action.split(" ")
             switch (arr[0]) {
                 case "View":
-                    if (arr[1] = "department") {
+                    if (arr[1] == "departments") {
                         depSearch();
                     }
-                    else if (arr[1] = "roles") {
+                    else if (arr[1] == "roles") {
                         roleSearch();
                     }
                     else {
@@ -52,7 +52,7 @@ function run() {
                     }
                     break;
                 case "Add":
-                    if (arr[1] = "department") {
+                    if (arr[1] = "departments") {
                         depAdd();
                     }
                     else if (arr[1] = "roles") {
@@ -72,17 +72,20 @@ function run() {
 function depSearch(){
     connection.query("SELECT * FROM department",function(err, res) {
         console.log(tableView.getTable(res))
+        run();
     }
 )};
 
 function roleSearch(){
     connection.query("SELECT A.title, A.salary, B.name FROM roles AS A INNER JOIN department AS B ON B.id = A.department_id",function(err, res) {
         console.log(tableView.getTable(res))
+        run();
     }
 )};
 
 function empSearch(){
     connection.query("SELECT A.first_name, A.last_name, B.title, B.salary, C.name FROM employees AS A INNER JOIN roles AS B ON B.id = A.role_id INNER JOIN department AS C ON C.id = B.department_id",function(err, res) {
         console.log(tableView.getTable(res))
+        run();
     }
 )};
