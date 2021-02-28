@@ -104,7 +104,6 @@ function depAdd() {
                 {
                     name: answer.name
                 }, function (err, res) {
-                    console.log(tableView.getTable(res))
                     depSearch();
                 })
 
@@ -139,7 +138,6 @@ function roleAdd() {
                     if (res[i].name == answer.departments) {
                         depID = res[i].id
                     }
-                    console.log(depID);
                 }
                 connection.query("INSERT INTO roles SET ?",
                     {
@@ -148,7 +146,6 @@ function roleAdd() {
                         department_id: depID
 
                     }, function (err, res) {
-                        console.log(tableView.getTable(res))
                         roleSearch();
                     })
             }
@@ -163,7 +160,6 @@ function empAdd() {
         for (let i = 0; i < res.length; i++) {
             roles.push(res[i].title)
         }
-        console.log(roles)
         inquirer
             .prompt([{
                 name: "firstname",
@@ -193,10 +189,62 @@ function empAdd() {
                         role_id: roleID
 
                     }, function (err, res) {
-                        console.log(tableView.getTable(res))
                         empSearch();
                     })
             }
             )
     })
 };
+
+//"UPDATE customers SET address = 'Canyon 123' WHERE address = 'Valley 345'"
+function empUpdate() {
+    connection.query("SELECT * FROM employees", function (err, res) {
+        var names = [];
+        var nameID;
+        for (let i = 0; i < res.length; i++) {
+            names.push(res[i].first_name + " " + res[i].last_name);
+            var obj = {
+                [names[i]]: res[i].id
+            }
+            nameID = { ...nameID, ...obj }
+        }
+        connection.query("SELECT * FROM roles", function (err, res) {
+            var roles = [];
+            var roleID;
+            for (let i = 0; i < res.length; i++) {
+                roles.push("" + res[i].title);
+                var obj = {
+                    [roles[i]]: res[i].id
+                }
+                roleID = { ...roleID, ...obj }
+            }
+            inquirer
+                .prompt([{
+                    name: "employeeSel",
+                    type: "list",
+                    message: "What employee would you like to update information for?",
+                    choices: names
+                }, {
+                    name: "roleSel",
+                    type: "list",
+                    message: "Please select the new role for employee",
+                    choices: roles
+                }
+                ]).then(function (answer) {
+                    for (let i = 0; i < res.length; i++) {
+                        if (res[i].title == answer.roles) {
+                            roleID = res[i].id
+                        }
+                    }
+                    let empID = nameID[answer.employeeSel];
+                    var rID= roleID[answer.roleSel];
+                    let queryUrl = "UPDATE employees SET role_id =" + rID + " WHERE id =" + empID + "";
+                    connection.query(queryUrl, function (err, res) {
+                            empSearch();
+                        })
+                }
+                )
+        })
+    })
+};
+
